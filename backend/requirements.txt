@@ -1,7 +1,15 @@
+# HTTP e scraping
 requests==2.31.0
 beautifulsoup4==4.12.2
+
+# Agendamento
 schedule==1.2.1
+
+# Variáveis de ambiente
 python-dotenv==1.0.0
+
+# Servidor do dashboard
 flask==3.1.1
-# opcional — para match semântico com IA:
+
+# Opcional — match semântico com IA (descomente se quiser usar)
 # anthropic==0.25.0
