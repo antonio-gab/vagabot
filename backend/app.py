@@ -60,5 +60,8 @@ def index():
 
 
 if __name__ == "__main__":
-    print("[Dashboard] Disponível em http://127.0.0.1:5000")
-    app.run(host="127.0.0.1", port=5000, debug=False)
+    import os
+    port = int(os.getenv("PORT", 5000))
+    host = "0.0.0.0"
+    print(f"[Dashboard] Disponível em http://{host}:{port}")
+    app.run(host=host, port=port, debug=False)
