@@ -8,8 +8,6 @@ schedule==1.2.1
 # Variáveis de ambiente
 python-dotenv==1.0.0
 
-# Servidor do dashboard
+# Servidor web
 flask==3.1.1
-
-# Opcional — match semântico com IA (descomente se quiser usar)
-# anthropic==0.25.0
+gunicorn==21.2.0

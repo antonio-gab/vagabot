@@ -1,2 +1,1 @@
-web: python backend/app.py
-worker: python backend/main.py
+web: cd backend && gunicorn --config gunicorn_config.py app:app
