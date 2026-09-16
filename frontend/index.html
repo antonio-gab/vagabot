@@ -3,16 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VagaBot</title>
+  <title>VagaBot — Dashboard</title>
 </head>
 <body>
   <div id="root"></div>
-  <p style="font-family:sans-serif;padding:20px;color:#555">
-    Para rodar o dashboard:<br><br>
-    1. Acesse <a href="https://stackblitz.com" target="_blank">stackblitz.com</a> ou <a href="https://codesandbox.io" target="_blank">codesandbox.io</a><br>
-    2. Crie um projeto React<br>
-    3. Cole o conteúdo de <code>dashboard.jsx</code> no arquivo <code>App.jsx</code><br>
-    4. O dashboard abre automaticamente
-  </p>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script type="text/babel" data-presets="react" src="/dashboard.jsx"></script>
 </body>
 </html>

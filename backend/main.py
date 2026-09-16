@@ -77,11 +77,13 @@ def _coletar(nome: str, scraper) -> list[dict]:
         return []
 
 
-def buscar_e_notificar(enviar: bool = True) -> dict:
+def buscar_e_notificar(enviar: bool = True, minimo: int | None = None) -> dict:
+    """Executa uma busca. ``minimo`` permite à interface mostrar todos os scores."""
+    limiar_match = MATCH_MINIMO if minimo is None else max(0, min(100, minimo))
     agora = datetime.now().strftime("%d/%m/%Y %H:%M")
     print(f"\n{'='*55}")
     print(f"[VagaBot] Iniciando busca — {agora}")
-    print(f"[VagaBot] Match mínimo: {MATCH_MINIMO}%")
+    print(f"[VagaBot] Match mínimo: {limiar_match}%")
     print(f"{'='*55}")
 
     # ── Coleta ────────────────────────────────────────────────────────────────
@@ -102,8 +104,8 @@ def buscar_e_notificar(enviar: bool = True) -> dict:
     print(f"[VagaBot] Após deduplicação: {len(todas)} vagas únicas")
 
     # ── Filtro por match ──────────────────────────────────────────────────────
-    filtradas = filtrar_vagas(todas, minimo=MATCH_MINIMO)
-    print(f"[VagaBot] Com match ≥ {MATCH_MINIMO}%: {len(filtradas)} vagas")
+    filtradas = filtrar_vagas(todas, minimo=limiar_match)
+    print(f"[VagaBot] Com match ≥ {limiar_match}%: {len(filtradas)} vagas")
 
     if filtradas:
         print("\n  Top vagas encontradas:")

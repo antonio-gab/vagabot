@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+const { useState, useEffect } = React;
 
 // ── Dados mock de vagas (simulando feeds RSS + scraping) ──────────────────────
 const MOCK_VAGAS = [
@@ -114,6 +114,16 @@ const PERFIL = {
   certificacoes: ["AI-900 Azure", "Excel 2016", "Power BI", "BD Avançado"],
 };
 
+function adaptarVaga(vaga) {
+  return {
+    ...vaga,
+    dataPublicacao: vaga.data || vaga.dataPublicacao || "",
+    skills: vaga.skills_match || vaga.skills || [],
+    nivel: vaga.nivel || "Não informado",
+    area: vaga.area || "Outras",
+  };
+}
+
 // ── Utilitários ───────────────────────────────────────────────────────────────
 function matchColor(m) {
   if (m >= 85) return "#00D97E";
@@ -135,7 +145,8 @@ function fonteColor(status) {
 
 function timeAgo(dateStr) {
   const d = new Date(dateStr);
-  const now = new Date("2026-09-15");
+  if (Number.isNaN(d.getTime())) return "data não informada";
+  const now = new Date();
   const diff = Math.floor((now - d) / 86400000);
   if (diff === 0) return "hoje";
   if (diff === 1) return "ontem";
@@ -489,7 +500,7 @@ function NotifToast({ msg, onClose }) {
 }
 
 // ── App Principal ─────────────────────────────────────────────────────────────
-export default function VagaBot() {
+function VagaBot() {
   const [botAtivo, setBotAtivo] = useState(true);
   const [notifEmail, setNotifEmail] = useState(true);
   const [vagaDetalhe, setVagaDetalhe] = useState(null);
@@ -498,11 +509,12 @@ export default function VagaBot() {
   const [toast, setToast] = useState(null);
   const [abaAtiva, setAbaAtiva] = useState("vagas");
   const [buscandoAgora, setBuscandoAgora] = useState(false);
-  const [vagas, setVagas] = useState(MOCK_VAGAS);
-  const [emailConfig, setEmailConfig] = useState("antonio@gmail.com");
-  const ultimaVerificacao = "hoje às 08:34";
+  const [vagas, setVagas] = useState([]);
+  const [emailConfig, setEmailConfig] = useState("");
+  const [ultimaVerificacao, setUltimaVerificacao] = useState("ainda não executada");
+  const [erroBusca, setErroBusca] = useState(null);
 
-  const areas = ["Todas", ...Array.from(new Set(MOCK_VAGAS.map(v => v.area)))];
+  const areas = ["Todas", ...Array.from(new Set(vagas.map(v => v.area)))];
 
   const vagasFiltradas = vagas
     .filter(v => filtroArea === "Todas" || v.area === filtroArea)
@@ -511,30 +523,29 @@ export default function VagaBot() {
 
   const totalNovas = vagas.filter(v => v.nova).length;
 
-  function buscarAgora() {
+  async function buscarAgora() {
     if (buscandoAgora) return;
     setBuscandoAgora(true);
-    setTimeout(() => {
+    setErroBusca(null);
+    try {
+      const resposta = await fetch("/api/buscar", { method: "POST" });
+      if (!resposta.ok) throw new Error("Resposta inválida do servidor");
+      const dados = await resposta.json();
+      if (dados.erro) throw new Error(dados.erro);
+      const vagasAtualizadas = (dados.vagas || []).map(adaptarVaga);
+      setVagas(vagasAtualizadas);
+      setUltimaVerificacao(new Date(dados.atualizado_em).toLocaleString("pt-BR"));
+      setToast(vagasAtualizadas.length
+        ? `${vagasAtualizadas.length} vaga(s) atualizada(s) com dados reais.`
+        : "Busca concluída; nenhuma vaga foi retornada.");
+    } catch (erro) {
+      setErroBusca("Não foi possível buscar as vagas. Verifique se o backend está em execução.");
+    } finally {
       setBuscandoAgora(false);
-      const novaVaga = {
-        id: 99,
-        titulo: "Estágio em Cloud Computing – AWS",
-        empresa: "Capgemini",
-        local: "Brasília, DF (Remoto)",
-        fonte: "Gupy",
-        area: "Infraestrutura",
-        nivel: "Estágio",
-        skills: ["AWS", "Linux", "Python"],
-        descricao: "Suporte a ambientes cloud, automação de tarefas e monitoramento de instâncias EC2.",
-        url: "#",
-        dataPublicacao: "2026-09-15",
-        match: 79,
-        nova: true,
-      };
-      setVagas(prev => [novaVaga, ...prev]);
-      setToast("Estágio em Cloud Computing – Capgemini");
-    }, 2800);
+    }
   }
+
+  useEffect(() => { buscarAgora(); }, []);
 
   return (
     <div style={{
@@ -625,6 +636,11 @@ export default function VagaBot() {
         {/* Aba: Vagas */}
         {abaAtiva === "vagas" && (
           <>
+            {erroBusca && (
+              <div style={{ background: "#3B1E25", border: "1px solid #B94A5A", color: "#FFB4BC", borderRadius: 10, padding: "12px 16px", marginBottom: 18, fontSize: 13 }}>
+                {erroBusca}
+              </div>
+            )}
             {/* Filtros */}
             <div style={{ display: "flex", gap: 12, marginBottom: 24, flexWrap: "wrap", alignItems: "center" }}>
               <div style={{ display: "flex", gap: 6 }}>
@@ -801,3 +817,5 @@ export default function VagaBot() {
     </div>
   );
 }
+
+ReactDOM.createRoot(document.getElementById("root")).render(<VagaBot />);

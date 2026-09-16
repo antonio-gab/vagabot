@@ -58,6 +58,10 @@ pip install -r requirements.txt
 cp .env.example .env
 python main.py --agora --sem-email  # valida coleta, deduplicação e match sem enviar
 python main.py --agora              # envia e-mail para vagas novas
+
+# Dashboard local com vagas reais (não envia e-mail)
+python app.py
+# abra http://127.0.0.1:5000
 ```
 
 ---
