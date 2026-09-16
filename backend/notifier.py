@@ -7,6 +7,7 @@ Pré-requisito: crie uma Senha de App no Google:
 
 import smtplib
 import ssl
+from html import escape
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from datetime import datetime
@@ -36,7 +37,7 @@ def _card_vaga(vaga: dict) -> str:
     labels       = vaga.get("labels", [])
     labels_html  = " ".join(
         f'<span style="background:#e0e7ff;color:#3730a3;'
-        f'font-size:11px;padding:2px 7px;border-radius:10px">{l}</span>'
+        f'font-size:11px;padding:2px 7px;border-radius:10px">{escape(str(l))}</span>'
         for l in labels[:5]
     )
     return f"""
@@ -46,15 +47,15 @@ def _card_vaga(vaga: dict) -> str:
               margin-bottom:8px">
     <div>
       <div style="font-size:16px;font-weight:600;color:#111827;margin-bottom:3px">
-        {vaga.get('titulo','')}
+        {escape(str(vaga.get('titulo','')))}
       </div>
       <div style="font-size:13px;color:#2563eb;margin-bottom:6px">
-        {vaga.get('empresa','') or vaga.get('fonte','')}
+        {escape(str(vaga.get('empresa','') or vaga.get('fonte','')))}
       </div>
       <div style="font-size:12px;color:#6b7280">
-        📍 {vaga.get('local','Não informado')} &nbsp;·&nbsp;
-        🏷 {vaga.get('fonte','')} &nbsp;·&nbsp;
-        📅 {vaga.get('data','')[:10]}
+        📍 {escape(str(vaga.get('local','Não informado')))} &nbsp;·&nbsp;
+        🏷 {escape(str(vaga.get('fonte','')))} &nbsp;·&nbsp;
+        📅 {escape(str(vaga.get('data',''))[:10])}
       </div>
     </div>
     <div style="flex-shrink:0;margin-left:12px">{_badge_match(vaga.get('match',0))}</div>
@@ -69,7 +70,7 @@ def _card_vaga(vaga: dict) -> str:
     📚 <b>Para aprender:</b> {skills_falta}
   </div>
 
-  <a href="{vaga.get('url','#')}"
+  <a href="{escape(str(vaga.get('url','#')), quote=True)}"
      style="display:inline-block;background:#2563eb;color:#ffffff;
             padding:9px 18px;border-radius:7px;text-decoration:none;
             font-size:13px;font-weight:500">
@@ -135,8 +136,8 @@ def enviar_email(vagas: list[dict]) -> bool:
         print("[Notifier] Nenhuma vaga para enviar.")
         return False
 
-    if not GMAIL_APP_PASSWORD:
-        print("[Notifier] GMAIL_APP_PASSWORD não configurado no .env — e-mail não enviado.")
+    if not all((GMAIL_USER, GMAIL_APP_PASSWORD, DESTINATARIO)):
+        print("[Notifier] Configure GMAIL_USER, GMAIL_APP_PASSWORD e DESTINATARIO no .env — e-mail não enviado.")
         return False
 
     msg = MIMEMultipart("alternative")

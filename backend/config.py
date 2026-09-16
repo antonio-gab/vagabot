@@ -15,9 +15,26 @@ GMAIL_APP_PASSWORD = os.getenv("GMAIL_APP_PASSWORD", "")
 DESTINATARIO      = os.getenv("DESTINATARIO", GMAIL_USER)
 GITHUB_TOKEN      = os.getenv("GITHUB_TOKEN", "")   # token para scraper GitHub
 
+
+def _bool_env(nome: str, padrao: bool = True) -> bool:
+    """Lê flags de ambiente sem transformar qualquer texto em verdadeiro."""
+    valor = os.getenv(nome)
+    if valor is None:
+        return padrao
+    return valor.strip().lower() in {"1", "true", "sim", "yes", "on"}
+
 # ── Comportamento ─────────────────────────────────────────────────────────────
 INTERVALO_HORAS = int(os.getenv("INTERVALO_HORAS", 6))
 MATCH_MINIMO    = int(os.getenv("MATCH_MINIMO", 60))  # 0–100
+
+# Fontes que já possuem scraper no projeto. CIEE continua desativado porque seu
+# scraper é apenas um esqueleto; LinkedIn só entra quando RSS_URL for definido.
+# As URLs RSS históricas dessas fontes não estão disponíveis atualmente. Elas
+# permanecem opt-in para que possam ser reativadas quando URLs válidas forem
+# configuradas, sem prejudicar a coleta padrão pelo GitHub.
+ATIVAR_GUPY         = _bool_env("ATIVAR_GUPY", False)
+ATIVAR_VAGAS_COM    = _bool_env("ATIVAR_VAGAS_COM", False)
+ATIVAR_PROGRAMATHOR = _bool_env("ATIVAR_PROGRAMATHOR", False)
 
 # ── Perfil do usuário ─────────────────────────────────────────────────────────
 PERFIL = {

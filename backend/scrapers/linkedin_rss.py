@@ -9,7 +9,12 @@ Como gerar a URL RSS:
 Cole a URL abaixo em RSS_URL.
 """
 
-import feedparser
+import hashlib
+import re
+
+import requests
+
+from scrapers.rss import parse_feed
 
 # Substitua pela sua URL RSS do LinkedIn
 RSS_URL = ""
@@ -20,16 +25,22 @@ def buscar_vagas() -> list[dict]:
         return []
     vagas = []
     try:
-        feed = feedparser.parse(RSS_URL)
-        for entry in feed.entries:
+        resposta = requests.get(RSS_URL, timeout=15, headers={"User-Agent": "vagabot/1.0"})
+        resposta.raise_for_status()
+        for entry in parse_feed(resposta.content):
+            link = entry.get("link", "")
+            titulo = entry.get("title", "")
             vagas.append({
-                "titulo": entry.get("title", ""),
+                "id": f"linkedin_{hashlib.sha256((link or titulo).encode()).hexdigest()[:16]}",
+                "titulo": titulo,
                 "empresa": "",
-                "url": entry.get("link", ""),
-                "descricao": entry.get("summary", ""),
+                "url": link,
+                "descricao": re.sub(r"<[^>]+>", " ", entry.get("summary", "")).strip(),
                 "data": entry.get("published", ""),
                 "fonte": "LinkedIn",
                 "area": "",
+                "local": "Não informado",
+                "labels": [],
             })
     except Exception as e:
         print(f"[LinkedIn] Erro: {e}")

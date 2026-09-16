@@ -9,11 +9,17 @@ Fórmula:
   - Até  5 pts: palavras-chave extras encontradas
 """
 
+import unicodedata
+
 from config import PERFIL
 
 
 def _normalizar(texto: str) -> str:
-    return texto.lower()
+    texto = str(texto or "").lower()
+    return "".join(
+        caractere for caractere in unicodedata.normalize("NFD", texto)
+        if unicodedata.category(caractere) != "Mn"
+    )
 
 
 def calcular_match(vaga: dict) -> dict:
@@ -38,7 +44,7 @@ def calcular_match(vaga: dict) -> dict:
         score_local = 20
     elif "remoto" in local or "remoto" in texto:
         score_local = 15
-    elif "híbrido" in local or "hibrido" in local:
+    elif "hibrido" in local or "hibrido" in texto:
         score_local = 10
 
     # ── Nível (0–15 pts) ─────────────────────────────────────────────────────
@@ -87,8 +93,8 @@ def remover_duplicatas(vagas: list[dict]) -> list[dict]:
     vistos_urls = set()
     unicas = []
     for v in vagas:
-        vid = v.get("id", "")
-        vurl = v.get("url", "")
+        vid = str(v.get("id", "")).strip()
+        vurl = str(v.get("url", "")).strip()
         if vid and vid in vistos_ids:
             continue
         if vurl and vurl in vistos_urls:
