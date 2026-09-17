@@ -19,6 +19,7 @@ from datetime import datetime
 from config import (
     ATIVAR_GUPY,
     ATIVAR_PROGRAMATHOR,
+    ATIVAR_LINKEDIN,
     ATIVAR_VAGAS_COM,
     GITHUB_TOKEN,
     INTERVALO_HORAS,
@@ -30,6 +31,7 @@ from notifier import enviar_email
 
 # Importa scrapers disponíveis
 from scrapers.github_vagas import buscar_vagas as github_vagas
+from scrapers.linkedin_rss import buscar_vagas as linkedin_vagas
 from scrapers.gupy import buscar_vagas as gupy_vagas
 from scrapers.programathor import buscar_vagas as programathor_vagas
 from scrapers.vagas_com import buscar_vagas as vagas_com_vagas
@@ -96,6 +98,8 @@ def buscar_e_notificar(enviar: bool = True, minimo: int | None = None) -> dict:
         todas.extend(_coletar("Vagas.com.br", vagas_com_vagas))
     if ATIVAR_PROGRAMATHOR:
         todas.extend(_coletar("Programathor", programathor_vagas))
+    if ATIVAR_LINKEDIN:
+        todas.extend(_coletar("LinkedIn RSS", linkedin_vagas))
 
     print(f"[VagaBot] Total bruto: {len(todas)} vagas coletadas")
 

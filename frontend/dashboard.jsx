@@ -5,13 +5,12 @@ const PERFIL_SKILLS = ["Python", "SQL", "Power BI", "Excel", "Git", "JavaScript"
 
 // ── Fontes com status real do projeto ────────────────────────────────────────
 const FONTES = [
-  { nome: "GitHub/frontendbr", status: "ativo"    },
-  { nome: "GitHub/backend-br", status: "ativo"    },
-  { nome: "Gupy (RSS)",        status: "inativo"  },
-  { nome: "Vagas.com.br",      status: "inativo"  },
-  { nome: "Programathor",      status: "inativo"  },
-  { nome: "CIEE",              status: "pendente" },
-  { nome: "LinkedIn RSS",      status: "pendente" },
+  { nome: "GitHub Issues",      status: "ativo"    },
+  { nome: "Gupy (50+ empresas)", status: "ativo"   },
+  { nome: "Vagas.com.br",       status: "ativo"    },
+  { nome: "Programathor",       status: "ativo"    },
+  { nome: "LinkedIn RSS",       status: "pendente" },
+  { nome: "CIEE",               status: "pendente" },
 ];
 
 // ── Utilitários ───────────────────────────────────────────────────────────────
